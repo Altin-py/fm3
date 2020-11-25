@@ -19,7 +19,7 @@ Data = pickle.load(infile)
 infile.close()
 
 
-def fm3(imageid=0, sigma=0.5,x1=0,x2=432,y1=0,y2=288):
+def main(imageid=0, sigma1=0.2, sigma2=0.5, sigma3=3.5,x1=0,x2=432,y1=0,y2=288): #positional arguments not yet used, summing over everything
     """
     args: 
 
@@ -32,37 +32,83 @@ def fm3(imageid=0, sigma=0.5,x1=0,x2=432,y1=0,y2=288):
     non filtered image and filtered image with computed focus measure M0,M1,M3
     """
     Data_clear = Data[imageid]
-    Data_blurr = gaussian(
-    Data_clear, sigma=(sigma, sigma), truncate=3.5, multichannel=False)
+
+
+    Data_blurr1 = gaussian(
+    Data_clear, sigma=(sigma1, sigma1), truncate=3.5, multichannel=False)
 
     M0_clear = np.sum(abs(fft2(Data_clear)))
-    M0_blurr = np.sum(abs(fft2(Data_blurr)))
-
-    M1_clear = np.sum(abs((Data_clear))**2)
-    M1_blurr = np.sum(abs((Data_blurr))**2)
-
+    M1_clear = np.sum(abs(fft2(Data_clear))**2)
     M3_clear = np.sum(abs(laplace(Data_clear))**2)
-    M3_blurr = np.sum(abs(laplace(Data_blurr))**2)
 
 
-    VERG = [M0_blurr/M0_clear, M1_blurr/M1_clear, M3_blurr/M3_clear]
+    M0_blurr = np.sum(abs(fft2(Data_blurr1))) 
+    M1_blurr = np.sum(abs(fft2(Data_blurr1))**2)
+    M3_blurr = np.sum(abs(laplace(Data_blurr1))**2)
+
+
+    VERG1 = [M0_blurr/M0_clear, M1_blurr/M1_clear, M3_blurr/M3_clear]
+    print(VERG1)
+
+
+    Data_blurr2 = gaussian(
+    Data_clear, sigma=(sigma2, sigma2), truncate=3.5, multichannel=False)
+
+
+    M0_blurr = np.sum(abs(fft2(Data_blurr2)))
+    M1_blurr = np.sum(abs(fft2(Data_blurr2))**2)
+    M3_blurr = np.sum(abs(laplace(Data_blurr2))**2)
+
+    VERG2 = [M0_blurr/M0_clear, M1_blurr/M1_clear, M3_blurr/M3_clear]
+    print(VERG2)
+
+
+    Data_blurr3 = gaussian(
+    Data_clear, sigma=(sigma3, sigma3), truncate=3.5, multichannel=False)
+
+    M0_blurr = np.sum(abs(fft2(Data_blurr3)))
+    M1_blurr = np.sum(abs(fft2(Data_blurr3))**2)
+    M3_blurr = np.sum(abs(laplace(Data_blurr3))**2)
+
+
+    VERG3 = [M0_blurr/M0_clear, M1_blurr/M1_clear, M3_blurr/M3_clear]
+    print(VERG2)
+
 
 
     f = plt.figure()
-    t1 = f.add_subplot(311)
+    t1 = f.add_subplot(231)
     t1.title.set_text('Scharfes Bild Nr.' + str(imageid))
+    t1.axis('off')
     plt.imshow(Data_clear)
 
-    t2 = f.add_subplot(312)
+    t2 = f.add_subplot(232)
     t2.title.set_text('Laplace Filter')
+    t2.axis('off')
     plt.imshow(laplace(Data_clear))
 
-    t3 = f.add_subplot(313)
-    t3.title.set_text('sigma = ' + str(sigma) + ' M0=' + str(round(VERG[0],4)) + ' M1 = ' + str(round(VERG[1],4))+ ' M3 = ' + str(round(VERG[2],4)))
-    plt.imshow(Data_blurr)
+    t3 = f.add_subplot(233)
+    t3.title.set_text('FFT')
+    t3.axis('off')
+    plt.imshow(abs(fft2(Data_clear)))
+
+
+    t4 = f.add_subplot(234)
+    t4.title.set_text('s1 = ' + str(sigma1) + ' M0=' + str(round(VERG1[0],4)) + '\n  M1 = ' + str(round(VERG1[1],4))+ ' M3 = ' + str(round(VERG1[2],4)))
+    t4.axis('off')
+    plt.imshow(Data_blurr1)
+
+    t5 = f.add_subplot(235)
+    t5.title.set_text('s2 = ' + str(sigma2) + ' M0=' + str(round(VERG2[0],4)) + '\n  M1 = ' + str(round(VERG2[1],4))+ ' M3 = ' + str(round(VERG2[2],4)))
+    t5.axis('off')
+    plt.imshow(Data_blurr2)
+
+    t6 = f.add_subplot(236)
+    t6.title.set_text('s3 = ' + str(sigma3) + ' M0=' + str(round(VERG3[0],4)) + '\n  M1 = ' + str(round(VERG3[1],4))+ 'M3 = ' + str(round(VERG3[2],4)))
+    t6.axis('off')
+    plt.imshow(Data_blurr3)
 
     f.set_figheight(15)
     f.set_figwidth(15)
     plt.show(block=True)
-
-    return VERG 
+main() 
