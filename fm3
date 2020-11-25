@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Nov 20 17:38:15 2020
+
+@author: altin
+Provided input Data function will determine focus measure 0,1,3 for a gaussian noise filtered image with constant sigma. For sigma = 0 the focus measure is set to one by default.
+
+"""
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.fftpack import fft2, ifft2
+from skimage.filters import gaussian, laplace
+import os
+import pickle
+dir_path = os.path.dirname(os.path.realpath('__file__')) # in diesem Fall sollten die Bilder im gleichen Ordner wie die das Skript liegen
+infile = open('Bilder', 'rb')
+Data = pickle.load(infile)
+infile.close()
+
+
+def fm3(imageid=0, sigma=0.5,x1=0,x2=432,y1=0,y2=288):
+    """
+    args: 
+
+    imageid: int number to select from set of data
+    sigma: float number to determine how wide the gaussian filter is
+    x1,x2,y1,y2: positional arguments of the included pixels integet number
+
+    returns:
+
+    non filtered image and filtered image with computed focus measure M0,M1,M3
+    """
+    Data_clear = Data[imageid]
+    Data_blurr = gaussian(
+    Data_clear, sigma=(sigma, sigma), truncate=3.5, multichannel=False)
+
+    M0_clear = np.sum(abs(fft2(Data_clear)))
+    M0_blurr = np.sum(abs(fft2(Data_blurr)))
+
+    M1_clear = np.sum(abs((Data_clear))**2)
+    M1_blurr = np.sum(abs((Data_blurr))**2)
+
+    M3_clear = np.sum(abs(laplace(Data_clear))**2)
+    M3_blurr = np.sum(abs(laplace(Data_blurr))**2)
+
+
+    VERG = [M0_blurr/M0_clear, M1_blurr/M1_clear, M3_blurr/M3_clear]
+
+
+    f = plt.figure()
+    t1 = f.add_subplot(311)
+    t1.title.set_text('Scharfes Bild Nr.' + str(imageid))
+    plt.imshow(Data_clear)
+
+    t2 = f.add_subplot(312)
+    t2.title.set_text('Laplace Filter')
+    plt.imshow(laplace(Data_clear))
+
+    t3 = f.add_subplot(313)
+    t3.title.set_text('sigma = ' + str(sigma) + ' M0=' + str(round(VERG[0],4)) + ' M1 = ' + str(round(VERG[1],4))+ ' M3 = ' + str(round(VERG[2],4)))
+    plt.imshow(Data_blurr)
+
+    f.set_figheight(15)
+    f.set_figwidth(15)
+    plt.show(block=True)
+
+    return VERG 
