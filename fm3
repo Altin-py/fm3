@@ -11,9 +11,8 @@ _DESCRIPTION = '''Plots the data and compares focus measures of 3 different gaus
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
-from Focusprogramm import blurrer, M123
 from scipy.fftpack import fft2
-from skimage.filters import laplace
+from skimage.filters import laplace, gaussian
 import os
 import pickle
 dir_path = os.path.dirname(os.path.realpath('__file__')) # in diesem Fall sollten die Bilder im gleichen Ordner wie die das Skript liegen
@@ -45,9 +44,9 @@ def main(): #positional arguments not yet used, summing over everything
     ################################################################
     Data_clear = Data[imageid]
 
-    Data_blurr1 = blurrer.blurrer(Data_clear, sigma1)
-    Data_blurr2 = blurrer.blurrer(Data_clear, sigma2)
-    Data_blurr3 = blurrer.blurrer(Data_clear, sigma3)
+    Data_blurr1 = blurrer(Data_clear, sigma1)
+    Data_blurr2 = blurrer(Data_clear, sigma2)
+    Data_blurr3 = blurrer(Data_clear, sigma3)
 
     M0, M1, M3 = M123(Data_clear)
     M0_b1, M1_b1, M3_b1 = M123(Data_blurr1)
@@ -68,12 +67,12 @@ def main(): #positional arguments not yet used, summing over everything
     t2 = f.add_subplot(232)
     t2.title.set_text('Laplace Filter')
     t2.axis('off')
-    plt.imshow(laplace(Data_clear))
+    plt.imshow(np.log(laplace(Data_clear)))
 
     t3 = f.add_subplot(233)
     t3.title.set_text('FFT')
     t3.axis('off')
-    plt.imshow(abs(fft2(Data_clear)))
+    plt.imshow(np.log(abs(np.fft.fftshift(np.fft.fft2(Data_clear)))))   
 
     ###############################################################
     ###############################Untere Plots####################
@@ -124,6 +123,16 @@ def _parse_arguments():
     args = parser.parse_args()
     return args
 
+def M123(Data):
+    M0 = np.sum(abs(fft2(Data)))
+    M1 = np.sum(abs(fft2(Data))**2)
+    M3 = np.sum(abs(laplace(Data))**2)
+    return M0, M1, M3
+
+def blurrer(Data_clear, sigma):
+    Data_blurr = gaussian(
+    Data_clear, sigma=(sigma, sigma), truncate=3.5, multichannel=False)
+    return Data_blurr
 
 if __name__ == '__main__':
     main()
