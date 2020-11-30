@@ -1,0 +1,12 @@
+#!/usr/bin/env python3
+"""
+Created on Mon Nov 30 13:05:05 2020
+
+@author: altin
+"""
+from skimage.filters import gaussian
+
+def blurrer(Data_clear, sigma):
+    Data_blurr = gaussian(
+    Data_clear, sigma=(sigma, sigma), truncate=3.5, multichannel=False)
+    return Data_blurr
