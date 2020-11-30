@@ -11,8 +11,7 @@ _DESCRIPTION = '''Plots the data and compares focus measures of 3 different gaus
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
-import blurrer
-import M123
+from Focusprogramm import blurrer, M123
 from scipy.fftpack import fft2
 from skimage.filters import laplace
 import os
