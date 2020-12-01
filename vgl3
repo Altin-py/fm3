@@ -3,6 +3,7 @@
 """
 
 import matplotlib.pyplot as plt
+import pandas as pd
 import numpy as np
 import argparse
 from scipy import ndimage
@@ -22,7 +23,6 @@ def main():
     M1arr = []
     M2arr = []
     M3arr = []
-    print(type(Data))
     for jj in range(9):
         M0, M1, M2, M3 = M123(Data[jj])
         M0arr.append(M0)
@@ -33,11 +33,10 @@ def main():
     M1 = M1arr/max(M1arr)
     M2 = M2arr/max(M2arr)
     M3 = M3arr/max(M3arr)
-    print(M0)
-    print(M1)
-    print(M2)
-    print(M3)
 
+    df = pd.DataFrame(list(zip(M0, M1, M2, M3)), index =['Bild 0', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'Bild 5', 'Bild 6', 'Bild 7', 'Bild 8'], 
+                                              columns =['M0', 'M1', 'M2', 'M3']) 
+    print(df)
 
 def M123(Data):
     M0 = np.sum(abs(fft2(Data)))
