@@ -11,6 +11,7 @@ _DESCRIPTION = '''Plots the data and compares focus measures of 3 different gaus
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
+from scipy import ndimage
 from scipy.fftpack import fft2
 from skimage.filters import laplace, gaussian
 import os
@@ -19,7 +20,6 @@ dir_path = os.path.dirname(os.path.realpath('__file__')) # in diesem Fall sollte
 infile = open('Bilder', 'rb')
 Data = pickle.load(infile)
 infile.close()
-
 
 def main(): #positional arguments not yet used, summing over everything
     """
@@ -36,41 +36,45 @@ def main(): #positional arguments not yet used, summing over everything
     ################################################################
     ################Parsing Arguments###############################
     args= _parse_arguments()
-    imageid = args.id
+    imageid = int(args.id)
     sigma1 = float(args.sig1)
     sigma2 = float(args.sig2)
     sigma3 = float(args.sig3)
-
+    
     ################################################################
     Data_clear = Data[imageid]
-
+    Data_clear = Data_clear
     Data_blurr1 = blurrer(Data_clear, sigma1)
     Data_blurr2 = blurrer(Data_clear, sigma2)
     Data_blurr3 = blurrer(Data_clear, sigma3)
 
-    M0, M1, M3 = M123(Data_clear)
-    M0_b1, M1_b1, M3_b1 = M123(Data_blurr1)
-    M0_b2, M1_b2, M3_b2 = M123(Data_blurr2)
-    M0_b3, M1_b3, M3_b3 = M123(Data_blurr3)
+    M0, M1, M2, M3 = M123(Data_clear)
+    M0_b1, M1_b1, M2_b1, M3_b1 = M123(Data_blurr1)
+    M0_b2, M1_b2, M2_b2, M3_b2 = M123(Data_blurr2)
+    M0_b3, M1_b3, M2_b3, M3_b3 = M123(Data_blurr3)
 
-    VERG1 = [M0_b1, M1_b1, M3_b1]
-    VERG2 = [M0_b2, M1_b2, M3_b2]
-    VERG3 = [M0_b3, M1_b3, M3_b3]
+    VERG1 = [M0_b1/M0, M1_b1/M1, M2_b1/M2, M3_b1/M3]
+    VERG2 = [M0_b2/M0, M1_b2/M1, M2_b2/M2, M3_b2/M3]
+    VERG3 = [M0_b3/M0, M1_b3/M1, M2_b3/M2, M3_b3/M3]
+    print(VERG1)
+    print(VERG2)
+    print(VERG3)
     #################################################################
     ####################Obere Plots##################################
     f = plt.figure()
     t1 = f.add_subplot(231)
-    t1.title.set_text('Scharfes Bild Nr.' + str(imageid))
+    t1.title.set_text(' Gradientgefiltertes Bild Nr.' + str(imageid))
     t1.axis('off')
-    plt.imshow(Data_clear)
+    Lata = abs(ndimage.sobel(Data_clear))
+    plt.imshow(Lata**(1))
 
     t2 = f.add_subplot(232)
-    t2.title.set_text('Laplace Filter')
+    t2.title.set_text('log Laplace Filter')
     t2.axis('off')
-    plt.imshow(np.log(laplace(Data_clear)))
+    plt.imshow(np.log((laplace(Data_clear))))
 
     t3 = f.add_subplot(233)
-    t3.title.set_text('FFT')
+    t3.title.set_text('log FFT')
     t3.axis('off')
     plt.imshow(np.log(abs(np.fft.fftshift(np.fft.fft2(Data_clear)))))   
 
@@ -78,21 +82,21 @@ def main(): #positional arguments not yet used, summing over everything
     ###############################Untere Plots####################
 
     t4 = f.add_subplot(234)
-    t4.title.set_text('s1 = ' + str(sigma1) + ' M0=' + str(round(VERG1[0],4)) + '\n  M1 = ' + str(round(VERG1[1],4))+ ' M3 = ' + str(round(VERG1[2],4)))
+    t4.title.set_text('s1 = ' + str(sigma1) + ' M0=' + str(round(VERG1[0],4)) + ' M1 = ' + str(round(VERG1[1],4))+ ' M2 = ' + str(round(VERG1[2],4))+ ' M3 = ' + str(round(VERG1[3],4)))
     t4.axis('off')
     plt.imshow(Data_blurr1)
 
     t5 = f.add_subplot(235)
-    t5.title.set_text('s2 = ' + str(sigma2) + ' M0=' + str(round(VERG2[0],4)) + '\n  M1 = ' + str(round(VERG2[1],4))+ ' M3 = ' + str(round(VERG2[2],4)))
+    t5.title.set_text('s2 = ' + str(sigma2) + ' M0=' + str(round(VERG2[0],4)) + ' M1 = ' + str(round(VERG2[1],4))+ '\n  M2 = ' + str(round(VERG2[2],4))+ ' M3 = ' + str(round(VERG2[3],4)))
     t5.axis('off')
     plt.imshow(Data_blurr2)
 
     t6 = f.add_subplot(236)
-    t6.title.set_text('s3 = ' + str(sigma3) + ' M0=' + str(round(VERG3[0],4)) + '\n  M1 = ' + str(round(VERG3[1],4))+ 'M3 = ' + str(round(VERG3[2],4)))
+    t6.title.set_text('s3 = ' + str(sigma3) + ' M0=' + str(round(VERG3[0],4)) + '\n  M1 = ' + str(round(VERG3[1],4))+ '\n  M2 = ' + str(round(VERG3[2],4))+ ' M3 = ' + str(round(VERG3[3],4)))
     t6.axis('off')
     plt.imshow(Data_blurr3)
 
-    f.set_figheight(15)
+    f.set_figheight(14)
     f.set_figwidth(15)
     plt.show(block=True)
     ###########################################################################
@@ -126,8 +130,9 @@ def _parse_arguments():
 def M123(Data):
     M0 = np.sum(abs(fft2(Data)))
     M1 = np.sum(abs(fft2(Data))**2)
+    M2 = np.sum(abs(ndimage.sobel(Data))**2)
     M3 = np.sum(abs(laplace(Data))**2)
-    return M0, M1, M3
+    return M0, M1, M2, M3
 
 def blurrer(Data_clear, sigma):
     Data_blurr = gaussian(
