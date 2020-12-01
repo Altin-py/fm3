@@ -40,7 +40,7 @@ def main(): #positional arguments not yet used, summing over everything
     sigma1 = float(args.sig1)
     sigma2 = float(args.sig2)
     sigma3 = float(args.sig3)
-    
+    name = args.t
     ################################################################
     Data_clear = Data[imageid]
     Data_clear = Data_clear
@@ -96,9 +96,16 @@ def main(): #positional arguments not yet used, summing over everything
     t6.axis('off')
     plt.imshow(Data_blurr3)
 
-    f.set_figheight(14)
+    f.set_figheight(15)
     f.set_figwidth(15)
+    if name is None:
+        print("Please give a title by using -t")
+    else:
+        imageid = str(imageid)
+        plt.savefig(name + imageid + ".pdf")
     plt.show(block=True)
+
+
     ###########################################################################
 
 
@@ -110,7 +117,7 @@ def _parse_arguments():
     parser.add_argument('-d', metavar='DIR', default='.', help=msg)
 
     msg = 'State desired title of figure'
-    parser.add_argument('-t',default=None, help=msg)
+    parser.add_argument('-t',default='messung', help=msg)
 
     msg = 'Index of Image from 0 to 8 '
     parser.add_argument('-id',default=0, help=msg)
