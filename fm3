@@ -14,12 +14,9 @@ import argparse
 from scipy import ndimage
 from scipy.fftpack import fft2
 from skimage.filters import laplace, gaussian
-import os
-import pickle
-dir_path = os.path.dirname(os.path.realpath('__file__')) # in diesem Fall sollten die Bilder im gleichen Ordner wie die das Skript liegen
-infile = open('Bilder', 'rb')
-Data = pickle.load(infile)
-infile.close()
+from reading import reading
+from blurrer import blurrer
+from M123 import M123
 
 def main(): #positional arguments not yet used, summing over everything
     """
@@ -33,6 +30,7 @@ def main(): #positional arguments not yet used, summing over everything
 
     non filtered image and filtered image with computed focus measure M0,M1,M3
     """
+    Data = reading('Bilder')
     ################################################################
     ################Parsing Arguments###############################
     args= _parse_arguments()
@@ -48,10 +46,10 @@ def main(): #positional arguments not yet used, summing over everything
     Data_blurr2 = blurrer(Data_clear, sigma2)
     Data_blurr3 = blurrer(Data_clear, sigma3)
 
-    M0, M1, M2, M3 = M123(Data_clear)
-    M0_b1, M1_b1, M2_b1, M3_b1 = M123(Data_blurr1)
-    M0_b2, M1_b2, M2_b2, M3_b2 = M123(Data_blurr2)
-    M0_b3, M1_b3, M2_b3, M3_b3 = M123(Data_blurr3)
+    M0, M1, M2, M3, Ms = M123(Data_clear)
+    M0_b1, M1_b1, M2_b1, M3_b1, Ms_1 = M123(Data_blurr1)
+    M0_b2, M1_b2, M2_b2, M3_b2, Ms_2 = M123(Data_blurr2)
+    M0_b3, M1_b3, M2_b3, M3_b3, Ms_3 = M123(Data_blurr3)
 
     VERG1 = [M0_b1/M0, M1_b1/M1, M2_b1/M2, M3_b1/M3]
     VERG2 = [M0_b2/M0, M1_b2/M1, M2_b2/M2, M3_b2/M3]
@@ -139,12 +137,9 @@ def M123(Data):
     M1 = np.sum(abs(fft2(Data))**2)
     M2 = np.sum(abs(ndimage.sobel(Data))**2)
     M3 = np.sum(abs(laplace(Data))**2)
-    return M0, M1, M2, M3
+    Ms = laplace(Data).var()
+    return M0, M1, M2, M3, Ms
 
-def blurrer(Data_clear, sigma):
-    Data_blurr = gaussian(
-    Data_clear, sigma=(sigma, sigma), truncate=3.5, multichannel=False)
-    return Data_blurr
 
 if __name__ == '__main__':
     main()
