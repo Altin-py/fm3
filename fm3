@@ -15,6 +15,7 @@ from scipy import ndimage
 from scipy.fftpack import fft2
 from skimage.filters import laplace, gaussian
 from reading import reading
+from remove_background import remove_background as rmbg
 from blurrer import blurrer
 from M123 import M123
 
@@ -40,7 +41,7 @@ def main(): #positional arguments not yet used, summing over everything
     sigma3 = float(args.sig3)
     name = args.t
     ################################################################
-    Data_clear = Data[imageid]
+    Data_clear = rmbg(Data[imageid],0,0)
     Data_clear = Data_clear
     Data_blurr1 = blurrer(Data_clear, sigma1)
     Data_blurr2 = blurrer(Data_clear, sigma2)
