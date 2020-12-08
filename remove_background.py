@@ -27,8 +27,8 @@ def remove_background(img, over_SP, under_SP, dilate_edge=2, erode_bg=5, crop_px
     # Mask must be 2px larger in each direction
     mask = cv2.copyMakeBorder(canny_img, 1, 1, 1, 1, cv2.BORDER_REFLECT)
     # To avoid black gaps at the border, cut 2px off the images
-    mask = mask[(crop_px/2):mask.shape[0] - (crop_px/2), (crop_px/2):mask.shape[1] - (crop_px/2)]
-    img_8bit = img_8bit[(crop_px/2):img_8bit.shape[0] - (crop_px/2), (crop_px/2):img_8bit.shape[1] - (crop_px/2)]
+    mask = mask[int(crop_px/2):mask.shape[0] - int(crop_px/2), int(crop_px/2):mask.shape[1] - int(crop_px/2)]
+    img_8bit = img_8bit[int(crop_px/2):img_8bit.shape[0] - int(crop_px/2), int(crop_px/2):img_8bit.shape[1] - int(crop_px/2)]
     height = img_8bit.shape[0]
     width = img_8bit.shape[1]
 
@@ -46,7 +46,7 @@ def remove_background(img, over_SP, under_SP, dilate_edge=2, erode_bg=5, crop_px
     img_corr = cv2.erode(img_8bit, kernel)
 
     # Values of img_corr are modified and will not be returned; use img_corr as mask for img
-    img = img[(crop_px/2):img.shape[0] - (crop_px/2), (crop_px/2):img.shape[1] - (crop_px/2)]
+    img = img[int(crop_px/2):img.shape[0] - int(crop_px/2), int(crop_px/2):img.shape[1] - int(crop_px/2)]
     img_no_bg = cv2.copyTo(img, img_corr.astype(np.uint8))
     # Remove strongly negative values (should be background)
     img_no_bg = np.where(img_no_bg < -5, 0, img_no_bg)

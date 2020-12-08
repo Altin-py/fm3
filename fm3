@@ -40,14 +40,15 @@ def main(): #positional arguments not yet used, summing over everything
     sigma2 = float(args.sig2)
     sigma3 = float(args.sig3)
     name = args.t
+    
     ################################################################
-    Data_clear = rmbg(Data[imageid],0,0)
-    Data_clear = Data_clear
-    Data_blurr1 = blurrer(Data_clear, sigma1)
-    Data_blurr2 = blurrer(Data_clear, sigma2)
-    Data_blurr3 = blurrer(Data_clear, sigma3)
+    Data_clear = Data[imageid]
+    Data_clearcut = rmbg(Data[imageid],"(0,0)",str((100,500)))
+    Data_blurr1 = rmbg(blurrer(Data_clear, sigma1),"(0,0)",str((100,500)))
+    Data_blurr2 = rmbg(blurrer(Data_clear, sigma2),"(0,0)",str((100,500)))
+    Data_blurr3 = rmbg(blurrer(Data_clear, sigma3),"(0,0)",str((100,500)))
 
-    M0, M1, M2, M3, Ms = M123(Data_clear)
+    M0, M1, M2, M3, Ms = M123(Data_clearcut)
     M0_b1, M1_b1, M2_b1, M3_b1, Ms_1 = M123(Data_blurr1)
     M0_b2, M1_b2, M2_b2, M3_b2, Ms_2 = M123(Data_blurr2)
     M0_b3, M1_b3, M2_b3, M3_b3, Ms_3 = M123(Data_blurr3)
