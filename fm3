@@ -43,7 +43,7 @@ def main(): #positional arguments not yet used, summing over everything
     
     ################################################################
     Data_clear = Data[imageid]
-    Data_clearcut = rmbg(Data[imageid],"(0,0)",str((100,500)))
+    Data_clearcut = rmbg(Data[imageid],"(100,0)",str((100,500)))
     Data_blurr1 = rmbg(blurrer(Data_clear, sigma1),"(0,0)",str((100,500)))
     Data_blurr2 = rmbg(blurrer(Data_clear, sigma2),"(0,0)",str((100,500)))
     Data_blurr3 = rmbg(blurrer(Data_clear, sigma3),"(0,0)",str((100,500)))

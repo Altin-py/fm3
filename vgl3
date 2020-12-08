@@ -4,6 +4,7 @@
 import pandas as pd
 from reading import reading
 from M123 import M123
+from tabulate import tabulate
 
 def main():
     """
@@ -27,9 +28,11 @@ def main():
     M3 = M3arr/max(M3arr)
     Ms = Msarr/max(Msarr)
 
-    df = pd.DataFrame(list(zip(M0, M1, M2, M3, Ms)), index =['Bild 0', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'Bild 5', 'Bild 6', 'Bild 7', 'Bild 8'], 
-                                              columns =['M0', 'M1', 'M2', 'M3', 'Ms']) 
-    print(df)
+    #df = pd.DataFrame(list(zip(M0, M1, M2, M3, Ms)), index =['Bild 0', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'Bild 5', 'Bild 6', 'Bild 7', 'Bild 8'], 
+                                              #columns =['M0', 'M1', 'M2', 'M3', 'Ms']) 
+    df = pd.DataFrame(list(zip(M0, M1, M2, M3)), index =['Bild 0', 'Bild 1', 'Bild 2', 'Bild 3', 'Bild 4', 'Bild 5', 'Bild 6', 'Bild 7', 'Bild 8'], 
+                                              columns =['M0', 'M1', 'M2', 'M3']) 
+    print(tabulate(df, headers='keys', tablefmt='psql'))
 
 
 if __name__ == '__main__':
