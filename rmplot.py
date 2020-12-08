@@ -13,6 +13,7 @@ def main():
         Data_clearcut = rmbg(Data[jj],"(100,0)",str((100,500)))
         jj = str(jj)
         f = plt.figure()
+        plt.title("Bild" + jj)
         plt.imshow(Data_clearcut)
         plt.savefig(jj +".png")
 
