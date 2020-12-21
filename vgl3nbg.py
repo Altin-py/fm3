@@ -2,9 +2,9 @@
 """
 """
 import pandas as pd
-from reading import reading
-from remove_background import remove_background as rmbg
-from M123 import M123
+from Methoden import reading
+from Methoden import remove_background as rmbg
+from Methoden import M123
 from tabulate import tabulate
 
 def main():

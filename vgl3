@@ -2,8 +2,8 @@
 """
 """
 import pandas as pd
-from reading import reading
-from M123 import M123
+from Methoden import reading
+from Methoden import M123
 from tabulate import tabulate
 
 def main():
