@@ -14,10 +14,11 @@ import argparse
 from scipy import ndimage
 from scipy.fftpack import fft2
 from skimage.filters import laplace, gaussian
-from reading import reading
-from remove_background import remove_background as rmbg
-from blurrer import blurrer
-from M123 import M123
+from Methoden import reading
+from Methoden import remove_background as rmbg
+from Methoden import blurrer
+from Methoden import M123
+from Methoden import normalize_img as nimg
 
 def main(): #positional arguments not yet used, summing over everything
     """
@@ -43,10 +44,10 @@ def main(): #positional arguments not yet used, summing over everything
     
     ################################################################
     Data_clear = Data[imageid]
-    Data_clearcut = rmbg(Data[imageid],"(100,0)",str((100,500)))
-    Data_blurr1 = rmbg(blurrer(Data_clear, sigma1),"(0,0)",str((100,500)))
-    Data_blurr2 = rmbg(blurrer(Data_clear, sigma2),"(0,0)",str((100,500)))
-    Data_blurr3 = rmbg(blurrer(Data_clear, sigma3),"(0,0)",str((100,500)))
+    Data_clearcut = nimg(rmbg(Data[imageid],"(100,0)",str((100,500))))
+    Data_blurr1 = nimg(rmbg(blurrer(Data_clear, sigma1),"(0,0)",str((100,500))))
+    Data_blurr2 = nimg(rmbg(blurrer(Data_clear, sigma1),"(0,0)",str((100,500))))
+    Data_blurr3 = nimg(rmbg(blurrer(Data_clear, sigma3),"(0,0)",str((100,500))))
 
     M0, M1, M2, M3, Ms = M123(Data_clearcut)
     M0_b1, M1_b1, M2_b1, M3_b1, Ms_1 = M123(Data_blurr1)
@@ -133,14 +134,6 @@ def _parse_arguments():
 
     args = parser.parse_args()
     return args
-
-def M123(Data):
-    M0 = np.sum(abs(fft2(Data)))
-    M1 = np.sum(abs(fft2(Data))**2)
-    M2 = np.sum(abs(ndimage.sobel(Data))**2)
-    M3 = np.sum(abs(laplace(Data))**2)
-    Ms = laplace(Data).var()
-    return M0, M1, M2, M3, Ms
 
 
 if __name__ == '__main__':
